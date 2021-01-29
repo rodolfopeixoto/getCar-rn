@@ -1,0 +1,12 @@
+{
+  "name": "uberFaker",
+  "displayName": "uberFaker",
+  "expo": {
+    "name": "uberFaker",
+    "slug": "uberFaker",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
