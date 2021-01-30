@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Dimensions } from "react-native";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import Search from "../Search";
 import Directions from "../Directions";
 import { getPixcelSize } from "../../utils";
+import markerImage from "../../assets/marker.png";
+import { LocationText, LocationBox } from "./styles";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -24,7 +26,9 @@ export default function Map() {
         return;
       }
 
-      let postionAsync = await Location.getCurrentPositionAsync({});
+      let postionAsync = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
 
       setLocation({
         latitude: postionAsync.coords.latitude,
@@ -33,19 +37,19 @@ export default function Map() {
     })();
   }, []);
 
-
   handleLocationSelected = (data, { geometry }) => {
-    const { location: { lat: latitude, lng: longitude }} = geometry;
+    const {
+      location: { lat: latitude, lng: longitude },
+    } = geometry;
 
     setDestination({
       destination: {
         latitude,
         longitude,
         title: data.structured_formatting.main_text,
-      }
-    })
-
-  }
+      },
+    });
+  };
 
   let loading = "Waiting...";
   if (errorMessage) {
@@ -57,7 +61,7 @@ export default function Map() {
 
   if (location !== null) {
     return (
-      <View style={{ flex: 1}}>
+      <View style={{ flex: 1 }}>
         <MapView
           style={{ flex: 1 }}
           region={{
@@ -70,27 +74,37 @@ export default function Map() {
           loadingEnabled
           ref={mapViewRef}
         >
+          {destination && (
+            <>
+              <Directions
+                origin={location}
+                destination={destination}
+                onReady={(result) => {
+                  mapViewRef.current.fitToCoordinates(result.coordinates, {
+                    edgePadding: {
+                      right: getPixcelSize(50),
+                      left: getPixcelSize(50),
+                      top: getPixcelSize(50),
+                      bottom: getPixcelSize(50),
+                    },
+                  });
+                }}
+              />
 
-      { destination && (
-          <Directions
-            origin={location}
-            destination={destination}
-            onReady={ result => {
-              mapViewRef.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {
-                  right: getPixcelSize(50),
-                  left: getPixcelSize(50),
-                  top: getPixcelSize(50),
-                  bottom: getPixcelSize(50)
-                }
-              })
-            }}
-
-          />
-        )
-
-      }
-
+              <Marker
+                coordinate={{
+                  latitude: destination.destination.latitude,
+                  longitude: destination.destination.longitude,
+                }}
+                anchor={{ x: 0, y: 0 }}
+                image={markerImage}
+              >
+               <LocationBox>
+                 <LocationText>{destination.destination.title}</LocationText>
+               </LocationBox>
+              </Marker>
+            </>
+          )}
         </MapView>
         <Search onLocationSelected={handleLocationSelected} />
       </View>
