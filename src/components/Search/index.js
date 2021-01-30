@@ -8,12 +8,13 @@ const QUERY = {
   language: 'pt-BR',
 }
 
-export default function Search() {
+export default function Search(props) {
+  const { onLocationSelected } = props;
   const [searchFocused, setSearchFocused] = useState(false);
   return (
     <GooglePlacesAutocomplete
       placeholder="Where to go ?"
-        onPress={(data, details = null) =>  console.log(data, details)}
+        onPress={onLocationSelected}
       query={QUERY}
       textInputProps={{
         onFocus: () => {
@@ -25,7 +26,6 @@ export default function Search() {
         autoCapitalize: 'none',
         autoCorrect: false,
       }}
-      listViewDisplayed='auto'
       fetchDetails
       debounce={200}
       enablePoweredByContainer={false}

@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, Dimensions } from "react-native";
 import MapView from "react-native-maps";
 import * as Location from "expo-location";
 import Search from "../Search";
+import Directions from "../Directions";
+import { getPixcelSize } from "../../utils";
+
+const { width, height } = Dimensions.get("window");
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export default function Map() {
   const [location, setLocation] = useState(null);
+  const [destination, setDestination] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const mapViewRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -15,11 +24,28 @@ export default function Map() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
+      let postionAsync = await Location.getCurrentPositionAsync({});
 
-      setLocation(location);
+      setLocation({
+        latitude: postionAsync.coords.latitude,
+        longitude: postionAsync.coords.longitude,
+      });
     })();
   }, []);
+
+
+  handleLocationSelected = (data, { geometry }) => {
+    const { location: { lat: latitude, lng: longitude }} = geometry;
+
+    setDestination({
+      destination: {
+        latitude,
+        longitude,
+        title: data.structured_formatting.main_text,
+      }
+    })
+
+  }
 
   let loading = "Waiting...";
   if (errorMessage) {
@@ -35,15 +61,38 @@ export default function Map() {
         <MapView
           style={{ flex: 1 }}
           region={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+            latitude: location.latitude,
+            longitude: location.longitude,
             latitudeDelta: 0.0143,
             longitudeDelta: 0.0134,
           }}
           showsUserLocation
           loadingEnabled
-        />
-        <Search />
+          ref={mapViewRef}
+        >
+
+      { destination && (
+          <Directions
+            origin={location}
+            destination={destination}
+            onReady={ result => {
+              mapViewRef.current.fitToCoordinates(result.coordinates, {
+                edgePadding: {
+                  right: getPixcelSize(50),
+                  left: getPixcelSize(50),
+                  top: getPixcelSize(50),
+                  bottom: getPixcelSize(50)
+                }
+              })
+            }}
+
+          />
+        )
+
+      }
+
+        </MapView>
+        <Search onLocationSelected={handleLocationSelected} />
       </View>
     );
   } else {

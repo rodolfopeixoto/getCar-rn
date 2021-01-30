@@ -16,8 +16,9 @@ Install [expo](http://expo.io)
 
 1. [Generate API Key](https://developers.google.com/places/web-service/get-api-key)
 2. Add API Key in file `src/components/Search/index.js` and in const `GOOGLE_PLACES_API_KEY` like: `const GOOGLE_PLACES_API_KEY = "MY-KEY";`
-3. Enable [Place API](https://console.cloud.google.com/apis/library/places-backend.googleapis.com?q=PLACE%20API&id=ecefdd63-ee2b-4751-b6c3-8e9113791baf&project=uber-faker-rod&supportedpurview=project)
-4. Enable [Geocoding API](https://console.cloud.google.com/apis/library/geocoding-backend.googleapis.com?q=Geoc&id=42fea2de-420b-4bd7-bd89-225be3b8b7b0&project=uber-faker-rod&supportedpurview=project)
+3. Enable [Place API](https://console.cloud.google.com/apis/library/places-backend.googleapis.com)
+4. Enable [Geocoding API](https://console.cloud.google.com/apis/library/geocoding-backend.googleapis.com)
+4. Enable [Directions API](https://console.cloud.google.com/marketplace/product/google/directions-backend.googleapis.com)
 
 Rename file `.env.example` to `.env` and add values in file. It is variables environment for app `localhost`.
 
