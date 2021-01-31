@@ -13,6 +13,7 @@ import {
   LocationTimeText,
   LocationTimeTextSmall,
 } from "./styles";
+import Geocoder from "react-native-geocoding";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -23,7 +24,10 @@ export default function Map() {
   const [destination, setDestination] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [duration, setDuration] = useState(0);
+  const [currentAddress, setCurrentAddress] = useState('');
   const mapViewRef = useRef(null);
+
+  Geocoder.init(process.env.GOOGLE_PLACES_API_KEY);
 
   useEffect(() => {
     (async () => {
@@ -33,13 +37,22 @@ export default function Map() {
         return;
       }
 
-      let postionAsync = await Location.getCurrentPositionAsync({
+      const postionAsync = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
 
+      const { coords } = postionAsync;
+      const { latitude, longitude } = coords;
+
+      const response = await Geocoder.from({ latitude, longitude });
+      const address = response.results[0].formatted_address;
+      const locationAddress = address.substring(0, address.indexOf(','));
+
+      setCurrentAddress(locationAddress);
+
       setLocation({
-        latitude: postionAsync.coords.latitude,
-        longitude: postionAsync.coords.longitude,
+        latitude,
+        longitude,
       });
     })();
   }, []);
@@ -87,8 +100,9 @@ export default function Map() {
                 origin={location}
                 destination={destination}
                 onReady={(result) => {
-                  const { duration, coordinates } = result;
-                  setDuration(duration);
+                  const { duration: durationTime, coordinates } = result;
+
+                  setDuration(durationTime);
                   mapViewRef.current.fitToCoordinates(coordinates, {
                     edgePadding: {
                       right: getPixcelSize(50),
@@ -126,7 +140,7 @@ export default function Map() {
                     <LocationTimeTextSmall>MIN</LocationTimeTextSmall>
                   </LocationTimeBox>
 
-                  <LocationText>R. Gulhierme Tal</LocationText>
+                  <LocationText>{currentAddress}</LocationText>
                 </LocationBox>
               </Marker>
             </>
