@@ -1,3 +1,4 @@
+import React from 'react';
 import { Platform } from "react-native";
 import styled, { css } from "styled-components/native";
 
@@ -40,4 +41,14 @@ export const LocationTimeTextSmall = styled.Text`
   color: #fff;
   font-size: 10px;
   text-align: center;
+`;
+
+
+export const Back = styled.TouchableOpacity`
+  position: absolute;
+  top: ${Platform.select({
+    ios: 100,
+    android: 80
+  })}px;
+  left: 20px;
 `;

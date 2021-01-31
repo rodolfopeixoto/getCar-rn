@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import Search from "../Search";
 import Directions from "../Directions";
 import { getPixcelSize } from "../../utils";
 import markerImage from "../../assets/marker.png";
+import backImage from "../../assets/back.png";
 import {
   LocationText,
   LocationBox,
   LocationTimeBox,
   LocationTimeText,
   LocationTimeTextSmall,
+  Back,
 } from "./styles";
 import Geocoder from "react-native-geocoding";
+import Details from "../Details";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -23,8 +26,8 @@ export default function Map() {
   const [location, setLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [duration, setDuration] = useState(0);
-  const [currentAddress, setCurrentAddress] = useState('');
+  const [timeRoute, setTimeRoute] = useState(0);
+  const [currentAddress, setCurrentAddress] = useState("");
   const mapViewRef = useRef(null);
 
   Geocoder.init(process.env.GOOGLE_PLACES_API_KEY);
@@ -46,7 +49,7 @@ export default function Map() {
 
       const response = await Geocoder.from({ latitude, longitude });
       const address = response.results[0].formatted_address;
-      const locationAddress = address.substring(0, address.indexOf(','));
+      const locationAddress = address.substring(0, address.indexOf(","));
 
       setCurrentAddress(locationAddress);
 
@@ -69,6 +72,23 @@ export default function Map() {
         title: data.structured_formatting.main_text,
       },
     });
+  };
+
+  handleMapZoomAndTimeRoute = ({ duration, coordinates }) => {
+    mapViewRef.current.fitToCoordinates(coordinates, {
+      edgePadding: {
+        right: getPixcelSize(50),
+        left: getPixcelSize(50),
+        top: getPixcelSize(50),
+        bottom: getPixcelSize(350),
+      },
+    });
+
+    setTimeRoute(duration);
+  };
+
+  handleBack = () => {
+    setDestination(null);
   };
 
   let loading = "Waiting...";
@@ -99,19 +119,7 @@ export default function Map() {
               <Directions
                 origin={location}
                 destination={destination}
-                onReady={(result) => {
-                  const { duration: durationTime, coordinates } = result;
-
-                  setDuration(durationTime);
-                  mapViewRef.current.fitToCoordinates(coordinates, {
-                    edgePadding: {
-                      right: getPixcelSize(50),
-                      left: getPixcelSize(50),
-                      top: getPixcelSize(50),
-                      bottom: getPixcelSize(50),
-                    },
-                  });
-                }}
+                onReady={handleMapZoomAndTimeRoute}
               />
 
               <Marker
@@ -136,7 +144,7 @@ export default function Map() {
               >
                 <LocationBox>
                   <LocationTimeBox>
-                    <LocationTimeText>{Math.floor(duration)}</LocationTimeText>
+                    <LocationTimeText>{Math.floor(timeRoute)}</LocationTimeText>
                     <LocationTimeTextSmall>MIN</LocationTimeTextSmall>
                   </LocationTimeBox>
 
@@ -146,7 +154,17 @@ export default function Map() {
             </>
           )}
         </MapView>
-        <Search onLocationSelected={handleLocationSelected} />
+
+        {destination ? (
+          <>
+            <Back onPress={handleBack}>
+              <Image source={backImage} />
+            </Back>
+            <Details />
+          </>
+        ) : (
+          <Search onLocationSelected={handleLocationSelected} />
+        )}
       </View>
     );
   } else {
