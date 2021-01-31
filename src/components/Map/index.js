@@ -6,7 +6,13 @@ import Search from "../Search";
 import Directions from "../Directions";
 import { getPixcelSize } from "../../utils";
 import markerImage from "../../assets/marker.png";
-import { LocationText, LocationBox } from "./styles";
+import {
+  LocationText,
+  LocationBox,
+  LocationTimeBox,
+  LocationTimeText,
+  LocationTimeTextSmall,
+} from "./styles";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -16,6 +22,7 @@ export default function Map() {
   const [location, setLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [duration, setDuration] = useState(0);
   const mapViewRef = useRef(null);
 
   useEffect(() => {
@@ -80,7 +87,9 @@ export default function Map() {
                 origin={location}
                 destination={destination}
                 onReady={(result) => {
-                  mapViewRef.current.fitToCoordinates(result.coordinates, {
+                  const { duration, coordinates } = result;
+                  setDuration(duration);
+                  mapViewRef.current.fitToCoordinates(coordinates, {
                     edgePadding: {
                       right: getPixcelSize(50),
                       left: getPixcelSize(50),
@@ -99,9 +108,26 @@ export default function Map() {
                 anchor={{ x: 0, y: 0 }}
                 image={markerImage}
               >
-               <LocationBox>
-                 <LocationText>{destination.destination.title}</LocationText>
-               </LocationBox>
+                <LocationBox>
+                  <LocationText>{destination.destination.title}</LocationText>
+                </LocationBox>
+              </Marker>
+
+              <Marker
+                coordinate={{
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                }}
+                anchor={{ x: 0, y: 0 }}
+              >
+                <LocationBox>
+                  <LocationTimeBox>
+                    <LocationTimeText>{Math.floor(duration)}</LocationTimeText>
+                    <LocationTimeTextSmall>MIN</LocationTimeTextSmall>
+                  </LocationTimeBox>
+
+                  <LocationText>R. Gulhierme Tal</LocationText>
+                </LocationBox>
               </Marker>
             </>
           )}

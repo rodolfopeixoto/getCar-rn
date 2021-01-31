@@ -1,7 +1,8 @@
-import styled from 'styled-components/native';
+import { Platform } from "react-native";
+import styled, { css } from "styled-components/native";
 
 export const LocationBox = styled.View`
-  background-color: #FFF;
+  background-color: #fff;
   shadow-color: #000;
   shadow-offset: 0 0;
   shadow-opacity: 0.1;
@@ -10,9 +11,33 @@ export const LocationBox = styled.View`
   border-radius: 3px;
   flex-direction: row;
 
+  ${Platform.select({
+    ios: css`
+      margin-top: 20px;
+    `,
+    android: css`
+      margin-top: 10px;
+      margin-left: 10px;
+    `,
+  })}
 `;
 export const LocationText = styled.Text`
   margin: 8px 10px;
   font-size: 14px;
   color: #333;
+`;
+
+export const LocationTimeBox = styled.View`
+  background-color: #222;
+  padding: 3px 8px;
+`;
+export const LocationTimeText = styled.Text`
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+`;
+export const LocationTimeTextSmall = styled.Text`
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
 `;
