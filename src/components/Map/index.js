@@ -84,7 +84,7 @@ export default function Map() {
       },
     });
 
-    setTimeRoute(duration);
+    // setTimeRoute(duration)
   };
 
   handleBack = () => {

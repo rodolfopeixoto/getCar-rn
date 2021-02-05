@@ -1,12 +1,31 @@
 {
-  "name": "uberFaker",
-  "displayName": "uberFaker",
+  "name": "getCar",
+  "displayName": "getCar",
+  "platforms": [
+    "ios",
+    "android"
+  ],
   "expo": {
-    "name": "uberFaker",
-    "slug": "uberFaker",
+    "name": "getCar",
+    "slug": "getCar",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "android": {
+      "package": "com.rodolfopeixoto.getCar"
+    }
+  },
+  "splash": {
+    "image": "./src/assets/uberx.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#fff"
+  },
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "com.rodolfopeixoto.getcar"
+  },
+  "android": {
+    "package": "com.rodolfopeixoto.getcar"
   }
 }
